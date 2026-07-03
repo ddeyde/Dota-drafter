@@ -35,6 +35,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "farm_weight": 5,
+      "lane_strength": 3,
       "carry": 0.9,
       "escape": 0.85,
       "nuker": 0.4,
@@ -61,6 +63,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "aoe_def": 4,
+      "lane_strength": 7,
+      "pierces_bkb": 1,
       "melee": 1,
       "initiator": 0.95,
       "durable": 0.8,
@@ -88,6 +93,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "pierces_bkb": 1,
+      "lane_strength": 8,
       "ranged": 1,
       "support": 0.9,
       "disabler": 1,
@@ -189,6 +196,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "lane_strength": 3,
       "melee": 1,
       "support": 0.85,
       "initiator": 0.95,
@@ -214,6 +222,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "debuff_immunity": 1,
+      "farm_weight": 4,
+      "lane_strength": 7,
       "carry": 0.9,
       "pusher": 0.7,
       "escape": 0.8,
@@ -364,6 +375,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "pierces_bkb": 1,
+      "lane_strength": 3,
       "weak_laner": 1,
       "melee": 1,
       "disabler": 0.85,
@@ -391,6 +404,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "offensive_dispel": 1,
+      "lane_strength": 9,
       "carry": 0.85,
       "durable": 0.8,
       "nuker": 0.6,
@@ -417,6 +432,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0.72
     },
     "tags": {
+      "aoe_def": 4,
+      "lane_strength": 6,
       "melee": 1,
       "initiator": 0.9,
       "disabler": 0.85,
@@ -549,6 +566,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0.84
     },
     "tags": {
+      "dispellable_buff": 1,
+      "lane_strength": 7,
       "carry": 0.8,
       "support": 0.7,
       "disabler": 0.8,
@@ -828,6 +847,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "farm_weight": 3,
+      "lane_strength": 5,
+      "pierces_bkb": 1,
       "disabler": 0.95,
       "initiator": 1,
       "pusher": 0.8,
@@ -877,6 +899,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "harass_heavy": 1,
+      "lane_strength": 8,
+      "farm_weight": 4,
       "lane_bully": 0.9,
       "ranged": 1,
       "carry": 0.9,
@@ -902,6 +927,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "dispellable_buff": 1,
+      "lane_strength": 8,
       "lane_bully": 0.8,
       "ranged": 1,
       "sustain": 1,
@@ -956,6 +983,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "pierces_bkb": 1,
+      "lane_strength": 8,
+      "push_tempo": 4,
       "initiator": 0.9,
       "disabler": 0.95,
       "durable": 0.8,
@@ -1126,6 +1156,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "dispellable_buff": 1,
+      "lane_strength": 7,
       "nuker": 0.9,
       "pusher": 0.95,
       "mana_dependent": 0.8,
@@ -1171,6 +1203,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "harass_heavy": 1,
+      "lane_strength": 9,
       "lane_bully": 1,
       "ranged": 1,
       "carry": 0.8,
@@ -1302,6 +1336,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0.72
     },
     "tags": {
+      "push_tempo": 5,
+      "farm_weight": 4,
+      "lane_strength": 6,
       "carry": 0.85,
       "support": 0.6,
       "nuker": 0.95,
@@ -1350,6 +1387,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "debuff_immunity": 1,
+      "farm_weight": 4,
+      "lane_strength": 7,
       "melee": 1,
       "sustain": 1,
       "carry": 0.9,
@@ -1451,6 +1491,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0.96
     },
     "tags": {
+      "offensive_dispel": 1,
+      "lane_strength": 9,
+      "harass_heavy": 1,
       "lane_bully": 0.9,
       "passive_reliant": 0.8,
       "sustain": 0.8,
@@ -1480,6 +1523,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "harass_heavy": 1,
+      "lane_strength": 9,
       "lane_bully": 0.9,
       "ranged": 1,
       "passive_reliant": 0.9,
@@ -1537,6 +1582,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "push_tempo": 5,
+      "lane_strength": 8,
       "carry": 0.85,
       "pusher": 0.95,
       "escape": 0.8,
@@ -1633,6 +1680,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "pierces_bkb": 1,
+      "lane_strength": 8,
       "initiator": 1,
       "disabler": 0.9,
       "escape": 0.7,
@@ -1678,6 +1727,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "farm_weight": 5,
+      "lane_strength": 3,
+      "dispellable_buff": 1,
       "melee": 1,
       "passive_reliant": 1,
       "carry": 0.95,
@@ -1705,6 +1757,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "lane_strength": 5,
       "ranged": 1,
       "support": 0.9,
       "disabler": 0.7,
@@ -1835,6 +1888,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0.48
     },
     "tags": {
+      "farm_weight": 5,
+      "lane_strength": 4,
+      "push_tempo": 3,
       "melee": 1,
       "healing": 1,
       "sustain": 1,
@@ -1945,6 +2001,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "push_tempo": 5,
+      "lane_strength": 6,
       "carry": 0.85,
       "pusher": 1,
       "durable": 0.8,
@@ -1971,6 +2029,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "offensive_dispel": 1,
+      "lane_strength": 6,
       "carry": 0.7,
       "initiator": 0.9,
       "durable": 0.85,
@@ -1997,6 +2057,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "pierces_bkb": 1,
+      "offensive_dispel": 1,
+      "lane_strength": 6,
       "ranged": 1,
       "break": 0.8,
       "support": 0.9,
@@ -2208,6 +2271,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "lane_strength": 7,
       "support": 0.95,
       "disabler": 0.9,
       "nuker": 0.7,
@@ -2468,6 +2532,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "pierces_bkb": 1,
+      "lane_strength": 6,
       "melee": 1,
       "initiator": 1,
       "disabler": 0.9,
@@ -2656,6 +2722,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "pierces_bkb": 1,
+      "lane_strength": 7,
+      "dispellable_buff": 1,
       "sustain": 0.8,
       "melee": 1,
       "carry": 0.8,
@@ -2764,6 +2833,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0.84
     },
     "tags": {
+      "aoe_def": 5,
+      "lane_strength": 7,
       "support": 0.7,
       "initiator": 0.7,
       "nuker": 0.7,
@@ -2843,6 +2914,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "offensive_dispel": 1,
+      "lane_strength": 6,
       "support": 0.95,
       "nuker": 0.7,
       "disabler": 0.6,
@@ -2993,6 +3066,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "harass_heavy": 1,
+      "lane_strength": 8,
       "support": 0.9,
       "nuker": 0.8,
       "disabler": 0.85,
