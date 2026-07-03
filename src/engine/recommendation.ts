@@ -66,12 +66,12 @@ export function recommendHeroes(
     const roleWeight = hero.roleWeights?.[desiredRole] || (hero.roles.includes(desiredRole) ? 1.0 : 0);
     score += roleWeight * 15.0; // Base baseline score
     if (roleWeight === 0) {
-      score -= 45.0; // Overridable penalty for completely off-role, allowing extreme counters to shine
+      score -= 35.0; // Overridable penalty for completely off-role, allowing extreme counters to shine
       reasoning.push(`Unconventional Role: This is an extreme flex pick for ${desiredRole}.`);
     } else if (roleWeight < 0.4) {
-      score -= 25.0; // Massive penalty for off-meta roles
+      score -= 15.0; // Massive penalty for off-meta roles
     } else if (roleWeight < 0.6) {
-      score -= 10.0; // Moderate penalty for flex roles
+      score -= 5.0; // Moderate penalty for flex roles
     }
 
     // -------------------------------------------------------------------------
@@ -83,9 +83,9 @@ export function recommendHeroes(
     if (highSustainActive) {
       const heroAntiHeal = (hTags['anti_heal'] || 0) + (hTags['heal_inhibition'] || 0);
       if (heroAntiHeal > 0) {
-        const boost = heroAntiHeal * enemySustain * 30.0; // Multiplier x2 (was 15.0)
+        const boost = heroAntiHeal * enemySustain * 12.0; 
         score += boost;
-        reasoning.push(`Extreme priority: Direct counter to enemy's high healing/sustain dependency.`);
+        reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: Direct counter to enemy's high healing/sustain dependency.`);
       }
     }
 
@@ -94,9 +94,9 @@ export function recommendHeroes(
     if (highPassiveActive) {
       const heroBreak = (hTags['break'] || 0);
       if (heroBreak > 0) {
-        const boost = heroBreak * enemyPassive * 20.0; // Multiplier x2 (was 10.0)
+        const boost = heroBreak * enemyPassive * 8.0; 
         score += boost;
-        reasoning.push(`High priority: 'Break' mechanic disables crucial enemy passive abilities.`);
+        reasoning.push(`[+${boost.toFixed(1)}] High priority: 'Break' mechanic disables crucial enemy passive abilities.`);
       }
     }
 
@@ -108,9 +108,9 @@ export function recommendHeroes(
                      (hTags['anti_illusion'] || 0) * 5.0 + 
                      (hTags['aoe_magic'] || 0) * 1.5;
       if (heroAoE > 0) {
-        const boost = heroAoE * enemyIllusionSummon * 7.0; // Multiplier x2 (was 3.5)
+        const boost = heroAoE * enemyIllusionSummon * 3.5; 
         score += boost;
-        reasoning.push(`Crucial AoE/Cleave to easily clear enemy illusions and swarm units.`);
+        reasoning.push(`[+${boost.toFixed(1)}] Crucial AoE/Cleave to easily clear enemy illusions and swarm units.`);
       } else {
         score -= 4.0; // Lacking AoE against illusioners gets penalized
       }
@@ -125,9 +125,9 @@ export function recommendHeroes(
                            (hTags['silence'] || 0) * 1.0 + 
                            (hTags['leash'] || 0) * 2.0;
       if (heroLockdown > 0) {
-        const boost = heroLockdown * enemyMobility * 5.0; // Multiplier x2 (was 2.5)
+        const boost = heroLockdown * enemyMobility * 2.5; 
         score += boost;
-        reasoning.push(`Strong Lockdown/Silence to prevent high-mobility enemy escapes.`);
+        reasoning.push(`[+${boost.toFixed(1)}] Strong Lockdown/Silence to prevent high-mobility enemy escapes.`);
       }
     }
 
@@ -136,8 +136,9 @@ export function recommendHeroes(
     if (highPushTempoActive) {
       const heroAoEDef = (hTags['aoe_def'] || 0) * 5.0 + (hTags['wave_clear'] || 0) * 3.0 + (hTags['pusher'] || 0) * 2.0;
       if (heroAoEDef > 0) {
-        score += heroAoEDef * enemyPushTempo * 3.0; // Boosted multiplier
-        reasoning.push(`Extreme priority: AoE Defense and wave clear to stop the enemy's aggressive push tempo.`);
+        const boost = heroAoEDef * enemyPushTempo * 1.5;
+        score += boost;
+        reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: AoE Defense and wave clear to stop the enemy's aggressive push tempo.`);
       }
     }
 
@@ -148,11 +149,13 @@ export function recommendHeroes(
       const regularControl = (hTags['hard_control'] || 0) + (hTags['silence'] || 0) + (hTags['root'] || 0);
       
       if (piercesBKB > 0) {
-        score += piercesBKB * enemyDebuffImmunity * 24.0; // Multiplier x2 (was 12.0)
-        reasoning.push(`Extreme priority: BKB-piercing control to lock down spell-immune enemies.`);
+        const boost = piercesBKB * enemyDebuffImmunity * 12.0;
+        score += boost;
+        reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: BKB-piercing control to lock down spell-immune enemies.`);
       } else if (regularControl > 0) {
-        score -= regularControl * enemyDebuffImmunity * 4.0;
-        reasoning.push(`Warning: Standard control abilities are useless against enemy spell immunity.`);
+        const penalty = regularControl * enemyDebuffImmunity * 4.0;
+        score -= penalty;
+        reasoning.push(`[-${penalty.toFixed(1)}] Warning: Standard control abilities are useless against enemy spell immunity.`);
       }
     }
 
@@ -161,30 +164,49 @@ export function recommendHeroes(
     if (highDispellableBuffsActive) {
       const offensiveDispel = (hTags['offensive_dispel'] || 0);
       if (offensiveDispel > 0) {
-        score += offensiveDispel * enemyDispellableBuffs * 20.0; // Multiplier x2 (was 10.0)
-        reasoning.push(`Extreme priority: Built-in dispel removes crucial enemy defensive buffs.`);
+        const boost = offensiveDispel * enemyDispellableBuffs * 8.0;
+        score += boost;
+        reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: Built-in dispel removes crucial enemy defensive buffs.`);
       }
     }
 
     // -------------------------------------------------------------------------
     // MICRO-COUNTER LAYER (STATIC TAG INTERSECTION)
     // -------------------------------------------------------------------------
+    const microCountersByEnemy: Record<string, {score: number, interactions: string[]}> = {};
     enemies.forEach(enemy => {
+      let enemyCounterScore = 0;
       Object.entries(hTags).forEach(([heroTag, heroTagWeight]) => {
         const counterMapping = TAG_COUNTERS[heroTag];
         if (counterMapping) {
           Object.entries(counterMapping).forEach(([enemyTag, multiplier]) => {
             const enemyTagWeight = enemy.tags[enemyTag] || (enemy.id === enemyTag ? 1.0 : 0);
             if (enemyTagWeight > 0) {
-              const addedScore = heroTagWeight * enemyTagWeight * multiplier * 1.5;
-              score += addedScore;
+              const addedScore = heroTagWeight * enemyTagWeight * multiplier * 1.0;
+              enemyCounterScore += addedScore;
               if (addedScore > 0.8) {
-                reasoning.push(`Excellent counter: ${hero.name}'s ${heroTag.replace(/_/g, ' ')} vs ${enemy.name}'s ${enemyTag.replace(/_/g, ' ')}.`);
+                if (!microCountersByEnemy[enemy.name]) microCountersByEnemy[enemy.name] = {score: 0, interactions: []};
+                microCountersByEnemy[enemy.name].interactions.push(`${heroTag.replace(/_/g, ' ')} -> ${enemyTag.replace(/_/g, ' ')}`);
               }
             }
           });
         }
       });
+      // Cap max counter score from a single enemy so one hero doesn't dominate the draft logic
+      let finalEnemyScore = enemyCounterScore;
+      if (enemyCounterScore > 15) {
+         finalEnemyScore = 15 + (enemyCounterScore - 15) * 0.2; // Soft cap
+      }
+      score += finalEnemyScore;
+      if (microCountersByEnemy[enemy.name]) {
+         microCountersByEnemy[enemy.name].score = finalEnemyScore;
+      }
+    });
+
+    Object.entries(microCountersByEnemy).forEach(([enemyName, data]) => {
+        if (data.interactions.length > 0) {
+            reasoning.push(`Counters ${enemyName} [+${data.score.toFixed(1)}]: ${data.interactions.slice(0, 2).join(', ')}`);
+        }
     });
 
     // -------------------------------------------------------------------------

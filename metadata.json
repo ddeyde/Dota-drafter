@@ -1,6 +1,6 @@
 {
-  "name": "Dota 2 AI Draft & Build Assistant",
-  "description": "Interactive Dota 2 assistant for draft recommendations and dynamic counter-item builds based on tags and weights.",
+  "name": "",
+  "description": "",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

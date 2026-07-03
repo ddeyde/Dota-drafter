@@ -16,10 +16,10 @@ export const TAG_COUNTERS: Record<string, Record<string, number>> = {
   spell_immunity: { disabler: 1.8, nuker: 1.5, magical: 1.5, mana_burn: 1.2, magic_damage: 1.5, aoe_magic: 1.5 },
   evasion: { physical_damage: 1.5, carry: 1.5, agility_core: 1.5 },
   aoe_damage: { illusioner: 2.0, pusher: 1.5, summoning: 1.5, phantom_lancer: 2.0, naga_siren: 2.0, meepo: 2.0, broodmother: 2.0 },
-  aoe_magic: { pusher: 1.5, summoning: 1.5, meepo: 1.5 }, // removed illusioner/phantom lancer because standard AoE magic doesn't kill late game illusions
+  aoe_magic: { pusher: 1.5, summoning: 1.5, meepo: 1.5 },
   cleave: { illusioner: 3.0, phantom_lancer: 3.0, naga_siren: 2.5, chaos_knight: 2.5, broodmother: 2.5, meepo: 2.0, summoning: 2.0 },
   hard_control: { escape: 2.5, mobility: 2.0, carry: 1.5, storm_spirit: 3.0, weaver: 2.5, anti_mage: 2.5, puck: 2.5 },
-  disabler: { carry: 1.5, brawler: 1.2 }, // Reduced from countering escape/mobility because slows don't stop them
+  disabler: { carry: 1.5, brawler: 1.2 },
   root: { mobility: 2.5, escape: 2.0, storm_spirit: 3.0, weaver: 2.5, anti_mage: 2.0, puck: 2.0, lycan: 2.5, bloodseeker: 2.0 },
   disarm: { physical_damage: 2.0, carry: 1.8, agility_core: 1.5, attack_speed: 1.5, ursa: 2.0, troll_warlord: 2.0 },
   spell_block: { single_target_spell: 2.0, catch: 1.5, initiator: 1.2, doom: 2.0, legion_commander: 2.0 },
