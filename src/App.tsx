@@ -21,8 +21,11 @@ export default function App() {
 
   // --- Build State ---
   const [myHero, setMyHero] = useState<Hero | null>(null);
+  const [myRole, setMyRole] = useState<Role>('Carry');
   const [matchEnemies, setMatchEnemies] = useState<EnemyState[]>([]);
   const [itemSearch, setItemSearch] = useState('');
+  const [enemySearch, setEnemySearch] = useState('');
+  const [selectedPhase, setSelectedPhase] = useState<'early_game' | 'mid_game' | 'late_game' | 'uber_late'>('uber_late');
   const [selectedEnemyId, setSelectedEnemyId] = useState<string | null>(null); // To know who we are giving items to
 
   // --- Recommendations ---
@@ -33,10 +36,10 @@ export default function App() {
   const recommendedHeroes = recommendationData.heroes;
   const draftWarnings = recommendationData.warnings;
 
-  const recommendedItems = useMemo(() => {
-    if (!myHero || matchEnemies.length === 0) return [];
-    return recommendItems(myHero, matchEnemies, 'Mid');
-  }, [myHero, matchEnemies]);
+  const matchRecommendations = useMemo(() => {
+    if (!myHero) return null;
+    return recommendItems(myHero, myRole, matchEnemies);
+  }, [myHero, myRole, matchEnemies]);
 
   // --- Helpers ---
   const filteredHeroes = HEROES.filter(h => h.name.toLowerCase().includes(heroSearch.toLowerCase()));
@@ -302,30 +305,43 @@ export default function App() {
               <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800/50 backdrop-blur-sm">
                  <div className="flex items-center gap-2 mb-4">
                     <Shield className="w-5 h-5 text-emerald-400" />
-                    <h2 className="text-lg font-semibold text-white">Your Hero</h2>
+                    <h2 className="text-lg font-semibold text-white">Your Hero & Role</h2>
                  </div>
                  {myHero ? (
                    <div className="flex items-center gap-4">
                      <img src={myHero.imageUrl} alt={myHero.name} className="w-20 h-20 object-cover rounded shadow-lg border-2 border-emerald-500" />
-                     <div>
-                       <h3 className="text-xl font-bold text-white">{myHero.name}</h3>
-                       <button onClick={() => { setMyHero(null); setMatchEnemies([]); setSelectedEnemyId(null); }} className="text-xs text-red-400 hover:text-red-300 uppercase tracking-wider font-semibold mt-1">
-                         Change Hero / Reset Match
-                       </button>
+                     <div className="space-y-2">
+                       <h3 className="text-xl font-bold text-white leading-none">{myHero.name}</h3>
+                       <select
+                         value={myRole}
+                         onChange={(e) => setMyRole(e.target.value as Role)}
+                         className="bg-slate-950 border border-slate-700 rounded text-xs text-emerald-400 font-bold px-2 py-1 focus:outline-none"
+                       >
+                         <option value="Carry">Pos 1 - Carry</option>
+                         <option value="Mid">Pos 2 - Mid</option>
+                         <option value="Offlane">Pos 3 - Offlane</option>
+                         <option value="Soft Support">Pos 4 - Soft Support</option>
+                         <option value="Hard Support">Pos 5 - Hard Support</option>
+                       </select>
+                       <div className="pt-1">
+                         <button onClick={() => { setMyHero(null); setMatchEnemies([]); setSelectedEnemyId(null); }} className="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-wider font-semibold">
+                           Change Hero / Reset
+                         </button>
+                       </div>
                      </div>
                    </div>
                  ) : (
                    <div className="text-center py-8 bg-slate-950 rounded-lg border border-slate-800">
                      <p className="text-sm text-slate-400 mb-4">Select your hero from the roster below to start dynamic item generation.</p>
-                     <div className="flex flex-col items-center gap-4 max-w-sm mx-auto">
+                     <div className="flex flex-col items-center gap-4 w-full px-4 md:px-8">
                         <input
                           type="text"
                           placeholder="Search your hero..."
                           value={heroSearch}
                           onChange={(e) => setHeroSearch(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                          className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
                         />
-                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 w-full max-h-48 overflow-y-auto">
+                        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3 w-full max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                           {filteredHeroes.map(hero => (
                             <button key={hero.id} onClick={() => setMyHero(hero)} className="relative rounded overflow-hidden hover:scale-105 transition-transform border border-transparent hover:border-emerald-500">
                               <img src={hero.imageUrl} alt={hero.name} className="w-full aspect-[4/3] object-cover" />
@@ -371,7 +387,24 @@ export default function App() {
                               </button>
                            </div>
                            <div className="flex-1">
-                              <h3 className="text-sm font-bold text-white mb-2">{enemy.hero.name}'s Vector</h3>
+                              <div className="flex items-center justify-between mb-2">
+                                <h3 className="text-sm font-bold text-white">{enemy.hero.name}'s Vector</h3>
+                                <select
+                                  value={enemy.role || ''}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    setMatchEnemies(enemies => enemies.map(en => en.hero.id === enemy.hero.id ? { ...en, role: e.target.value as Role } : en));
+                                  }}
+                                  className="bg-slate-900 border border-slate-700 text-[10px] text-slate-300 rounded px-1 py-0.5 focus:outline-none"
+                                >
+                                  <option value="">Role (Optional)</option>
+                                  <option value="Carry">Pos 1</option>
+                                  <option value="Mid">Pos 2</option>
+                                  <option value="Offlane">Pos 3</option>
+                                  <option value="Soft Support">Pos 4</option>
+                                  <option value="Hard Support">Pos 5</option>
+                                </select>
+                              </div>
                               <div className="flex gap-2">
                                 {enemy.items.map((item, idx) => (
                                   <div key={idx} className="relative group/item" onClick={(e) => { e.stopPropagation(); setMatchEnemies(enemies => enemies.map(en => en.hero.id === enemy.hero.id ? { ...en, items: en.items.filter((_, i) => i !== idx) } : en)); }}>
@@ -398,10 +431,19 @@ export default function App() {
                   {/* Add Enemy Selector */}
                   {matchEnemies.length < 5 && (
                     <div className="mt-6 pt-6 border-t border-slate-800">
-                      <h3 className="text-sm font-semibold text-slate-300 mb-3">Add Enemy Hero</h3>
-                      <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                        {HEROES.filter(h => h.id !== myHero.id && !matchEnemies.some(e => e.hero.id === h.id)).map(hero => (
-                          <button key={hero.id} onClick={() => handleHeroSelect(hero)} className="shrink-0 relative rounded overflow-hidden hover:scale-105 transition-transform border border-transparent hover:border-red-500 w-16">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-semibold text-slate-300">Add Enemy Hero</h3>
+                        <input
+                          type="text"
+                          placeholder="Search enemy..."
+                          value={enemySearch}
+                          onChange={(e) => setEnemySearch(e.target.value)}
+                          className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-red-500 w-48"
+                        />
+                      </div>
+                      <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-8 lg:grid-cols-10 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                        {HEROES.filter(h => h.id !== myHero.id && !matchEnemies.some(e => e.hero.id === h.id) && h.name.toLowerCase().includes(enemySearch.toLowerCase())).map(hero => (
+                          <button key={hero.id} onClick={() => handleHeroSelect(hero)} className="relative rounded overflow-hidden hover:scale-105 transition-transform border border-transparent hover:border-red-500">
                             <img src={hero.imageUrl} alt={hero.name} className="w-full aspect-[4/3] object-cover" />
                           </button>
                         ))}
@@ -424,9 +466,9 @@ export default function App() {
                           className="bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-xs focus:outline-none focus:border-red-500"
                         />
                       </div>
-                      <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                         {filteredItems.map(item => (
-                          <button key={item.id} onClick={() => handleItemSelect(item)} className="shrink-0 relative rounded overflow-hidden hover:scale-105 transition-transform border border-slate-700 hover:border-red-400 w-[50px] h-[40px]" title={item.name}>
+                          <button key={item.id} onClick={() => handleItemSelect(item)} className="relative rounded overflow-hidden hover:scale-105 transition-transform border border-slate-700 hover:border-red-400 aspect-[4/3]" title={item.name}>
                             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                           </button>
                         ))}
@@ -437,7 +479,7 @@ export default function App() {
               )}
             </div>
 
-            {/* AI Item Recomme */}
+            {/* AI Item Recommendations */}
             <div className="lg:col-span-4">
               <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 shadow-2xl sticky top-24">
                 <div className="flex items-center gap-2 mb-6">
@@ -445,8 +487,8 @@ export default function App() {
                   <h2 className="text-lg font-semibold text-white">Dynamic Build Vector</h2>
                 </div>
 
-                <div className="space-y-4">
-                  {!myHero ? (
+                <div className="space-y-6">
+                  {!myHero || !matchRecommendations ? (
                     <div className="text-center py-8 text-slate-500 text-sm">
                       Select your hero to initialize item core logic.
                     </div>
@@ -455,37 +497,59 @@ export default function App() {
                       Awaiting enemy trajectory data...
                     </div>
                   ) : (
-                    recommendedItems.map((rec, idx) => (
-                      <div key={rec.item.id} className="bg-slate-950 rounded-lg p-3 border border-slate-800 flex flex-col gap-3 group hover:border-slate-700 transition-colors">
-                        <div className="flex items-start gap-3">
-                          <img src={rec.item.imageUrl} alt={rec.item.name} className="w-[60px] h-[45px] object-cover rounded shadow-md border border-slate-700" />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-0.5">
-                              <h3 className="font-bold text-sm text-white group-hover:text-sky-300 transition-colors">{rec.item.name}</h3>
-                              <div className="flex items-center gap-2">
-                                {rec.item.tier && (
-                                  <span className="text-[9px] text-slate-400 font-medium uppercase tracking-wider">{rec.item.tier.split(':')[0]}</span>
-                                )}
-                                <span className="text-[10px] text-amber-400 font-mono font-bold">
-                                  {rec.item.cost}g
-                                </span>
-                              </div>
-                            </div>
-                            <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-300 font-mono mb-2 inline-block">
-                              FIT SCORE: {rec.score.toFixed(1)}
-                            </span>
-                          </div>
-                        </div>
-                        <ul className="text-xs text-slate-400 space-y-1.5 border-t border-slate-800/50 pt-2">
-                          {rec.reasoning.map((r, i) => (
-                            <li key={i} className="flex gap-1.5 items-start">
-                              <ChevronRight className="w-3 h-3 text-sky-500 shrink-0 mt-0.5" />
-                              <span className="leading-snug">{r}</span>
-                            </li>
-                          ))}
-                        </ul>
+                    <>
+                      <div className="flex bg-slate-950 rounded-lg p-1 border border-slate-800 mb-2">
+                        {[
+                          { id: 'early_game', label: 'Early' },
+                          { id: 'mid_game', label: 'Mid' },
+                          { id: 'late_game', label: 'Late' },
+                          { id: 'uber_late', label: 'Uber Late' }
+                        ].map(phase => (
+                          <button
+                            key={phase.id}
+                            onClick={() => setSelectedPhase(phase.id as any)}
+                            className={cn("flex-1 px-2 py-1.5 text-[10px] sm:text-xs font-bold rounded-md transition-colors text-center", selectedPhase === phase.id ? "bg-sky-600 text-white shadow-md" : "text-slate-400 hover:text-white")}
+                          >
+                            {phase.label}
+                          </button>
+                        ))}
                       </div>
-                    ))
+
+                      <div className="space-y-3">
+                        {matchRecommendations[selectedPhase].length === 0 ? (
+                          <p className="text-xs text-slate-600 italic text-center py-4">No recommendations for this phase.</p>
+                        ) : (
+                          matchRecommendations[selectedPhase].map(rec => (
+                            <div key={rec.item.id} className="bg-slate-950 rounded-lg p-3 border border-slate-800 flex flex-col gap-3 group hover:border-slate-700 transition-colors">
+                              <div className="flex items-start gap-3">
+                                <img src={rec.item.imageUrl} alt={rec.item.name} className="w-[50px] h-[37px] object-cover rounded shadow-md border border-slate-700" />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-0.5">
+                                    <h4 className="font-bold text-sm text-white group-hover:text-sky-300 transition-colors">{rec.item.name}</h4>
+                                    <span className="text-[10px] text-amber-400 font-mono font-bold">
+                                      {rec.item.cost}g
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-300 font-mono mb-2 inline-block">
+                                    SCORE: {rec.score.toFixed(1)}
+                                  </span>
+                                </div>
+                              </div>
+                              {rec.reasoning.length > 0 && (
+                                <ul className="text-xs text-slate-400 space-y-1.5 border-t border-slate-800/50 pt-2">
+                                  {rec.reasoning.map((r, i) => (
+                                    <li key={i} className="flex gap-1.5 items-start">
+                                      <ChevronRight className="w-3 h-3 text-sky-500 shrink-0 mt-0.5" />
+                                      <span className="leading-snug">{r}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </>
                   )}
                 </div>
               </div>

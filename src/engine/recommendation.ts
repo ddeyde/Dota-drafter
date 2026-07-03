@@ -57,21 +57,26 @@ export function recommendHeroes(
          !enemies.some(e => e.id === h.id)
   );
 
+  const knownHeroesCount = allies.length + enemies.length;
+  // Draft Progress (Kp) ranges from 0.0 to 1.0 (assuming 10 heroes total)
+  const Kp = knownHeroesCount / 10.0;
+
   const evaluatedHeroes = heroesToEvaluate.map(hero => {
-    let score = 0;
+    let baseRoleScore = 0;
+    let contextScore = 0;
     const reasoning: string[] = [];
     const hTags = hero.tags;
 
     // Baseline Weight based on Role Meta viability
     const roleWeight = hero.roleWeights?.[desiredRole] || (hero.roles.includes(desiredRole) ? 1.0 : 0);
-    score += roleWeight * 15.0; // Base baseline score
+    baseRoleScore += roleWeight * 50.0; // Base baseline score
     if (roleWeight === 0) {
-      score -= 35.0; // Overridable penalty for completely off-role, allowing extreme counters to shine
-      reasoning.push(`Unconventional Role: This is an extreme flex pick for ${desiredRole}.`);
+      baseRoleScore -= 100.0; // Overridable penalty for completely off-role, allowing extreme counters to shine
+      if (Kp < 0.6) reasoning.push(`Unconventional Role: This is an extreme flex pick for ${desiredRole}.`);
     } else if (roleWeight < 0.4) {
-      score -= 15.0; // Massive penalty for off-meta roles
+      baseRoleScore -= 50.0; // Massive penalty for off-meta roles
     } else if (roleWeight < 0.6) {
-      score -= 5.0; // Moderate penalty for flex roles
+      baseRoleScore -= 20.0; // Moderate penalty for flex roles
     }
 
     // -------------------------------------------------------------------------
@@ -84,7 +89,7 @@ export function recommendHeroes(
       const heroAntiHeal = (hTags['anti_heal'] || 0) + (hTags['heal_inhibition'] || 0);
       if (heroAntiHeal > 0) {
         const boost = heroAntiHeal * enemySustain * 12.0; 
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: Direct counter to enemy's high healing/sustain dependency.`);
       }
     }
@@ -95,7 +100,7 @@ export function recommendHeroes(
       const heroBreak = (hTags['break'] || 0);
       if (heroBreak > 0) {
         const boost = heroBreak * enemyPassive * 8.0; 
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] High priority: 'Break' mechanic disables crucial enemy passive abilities.`);
       }
     }
@@ -109,10 +114,10 @@ export function recommendHeroes(
                      (hTags['aoe_magic'] || 0) * 1.5;
       if (heroAoE > 0) {
         const boost = heroAoE * enemyIllusionSummon * 3.5; 
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] Crucial AoE/Cleave to easily clear enemy illusions and swarm units.`);
       } else {
-        score -= 4.0; // Lacking AoE against illusioners gets penalized
+        contextScore -= 4.0; // Lacking AoE against illusioners gets penalized
       }
     }
 
@@ -126,7 +131,7 @@ export function recommendHeroes(
                            (hTags['leash'] || 0) * 2.0;
       if (heroLockdown > 0) {
         const boost = heroLockdown * enemyMobility * 2.5; 
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] Strong Lockdown/Silence to prevent high-mobility enemy escapes.`);
       }
     }
@@ -137,7 +142,7 @@ export function recommendHeroes(
       const heroAoEDef = (hTags['aoe_def'] || 0) * 5.0 + (hTags['wave_clear'] || 0) * 3.0 + (hTags['pusher'] || 0) * 2.0;
       if (heroAoEDef > 0) {
         const boost = heroAoEDef * enemyPushTempo * 1.5;
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: AoE Defense and wave clear to stop the enemy's aggressive push tempo.`);
       }
     }
@@ -150,11 +155,11 @@ export function recommendHeroes(
       
       if (piercesBKB > 0) {
         const boost = piercesBKB * enemyDebuffImmunity * 12.0;
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: BKB-piercing control to lock down spell-immune enemies.`);
       } else if (regularControl > 0) {
         const penalty = regularControl * enemyDebuffImmunity * 4.0;
-        score -= penalty;
+        contextScore -= penalty;
         reasoning.push(`[-${penalty.toFixed(1)}] Warning: Standard control abilities are useless against enemy spell immunity.`);
       }
     }
@@ -165,7 +170,7 @@ export function recommendHeroes(
       const offensiveDispel = (hTags['offensive_dispel'] || 0);
       if (offensiveDispel > 0) {
         const boost = offensiveDispel * enemyDispellableBuffs * 8.0;
-        score += boost;
+        contextScore += boost;
         reasoning.push(`[+${boost.toFixed(1)}] Extreme priority: Built-in dispel removes crucial enemy defensive buffs.`);
       }
     }
@@ -197,7 +202,7 @@ export function recommendHeroes(
       if (enemyCounterScore > 15) {
          finalEnemyScore = 15 + (enemyCounterScore - 15) * 0.2; // Soft cap
       }
-      score += finalEnemyScore;
+      contextScore += finalEnemyScore;
       if (microCountersByEnemy[enemy.name]) {
          microCountersByEnemy[enemy.name].score = finalEnemyScore;
       }
@@ -239,36 +244,36 @@ export function recommendHeroes(
 
       // Melee Limit Prevention
       if (teamMeleeCount >= 3 && (hTags['melee'] || 0) > 0) {
-        score -= 20.0;
+        contextScore -= 20.0;
         reasoning.push(`Too many melee heroes! Picking another melee hero ruins teamfight spacing.`);
       } else if (teamMeleeCount === 2 && (hTags['melee'] || 0) > 0 && (desiredRole === 'Mid' || desiredRole === 'Soft Support' || desiredRole === 'Hard Support')) {
-        score -= 5.0;
+        contextScore -= 5.0;
         reasoning.push(`Melee counts are high; prefer a ranged hero for better draft spacing.`);
       }
 
       // Farm Weight (Greed) Matrix
       if (teamFarmWeightTotal >= 10 && desiredRole === 'Offlane') {
          if (hFarmWeight > 2) {
-             score -= 50.0;
+             contextScore -= 50.0;
              reasoning.push(`Critical: Team is already extremely greedy. A core with high farm dependency will starve the map.`);
          } else {
-             score += 15.0;
+             contextScore += 15.0;
              reasoning.push(`Excellent tempo pick to balance out the team's greedy cores.`);
          }
       } else if (teamFarmWeightTotal >= 10 && desiredRole === 'Mid') {
          if (hFarmWeight > 3) {
-             score -= 30.0;
+             contextScore -= 30.0;
              reasoning.push(`Warning: Team is very greedy. A highly farm-dependent mid will struggle for space.`);
          } else {
-             score += 10.0;
+             contextScore += 10.0;
              reasoning.push(`Good tempo mid to balance the draft's economy.`);
          }
       } else if (teamFarmWeightTotal >= 10 && desiredRole === 'Carry') {
          if (hFarmWeight >= 4) {
-             score -= 15.0;
+             contextScore -= 15.0;
              reasoning.push(`Warning: Team is already extremely greedy. An ultra-greedy carry might struggle for space.`);
          } else {
-             score += 10.0;
+             contextScore += 10.0;
              reasoning.push(`Excellent tempo carry to balance out the team's greedy cores.`);
          }
       }
@@ -276,7 +281,7 @@ export function recommendHeroes(
       // Economy Greed Safeguard (Lifestealer on offlane / Carry on off-role)
       if (desiredRole !== 'Carry' && teamFarmNeed > 1.4 && ((hTags['carry'] || 0) > 0.6 || (hTags['farming'] || 0) > 0.6)) {
         const greedPenalty = (teamFarmNeed - 1.0) * 12.0;
-        score -= greedPenalty;
+        contextScore -= greedPenalty;
         reasoning.push(`Draft is already farm-heavy; selecting a greedy core on an off-role will starve your team of map gold.`);
       }
 
@@ -287,11 +292,11 @@ export function recommendHeroes(
         
         if (enemyLaneBully > 1.0 || avgEnemyLaneStrength > 6) {
           if (myLaneStrength < 4) {
-             score -= 30.0;
+             contextScore -= 30.0;
              reasoning.push(`Unplayable lane: Guaranteed to be crushed by oppressive enemy laners in the first 10 minutes.`);
           } else if ((hTags['weak_laner'] || 0) > 0 || ((hTags['melee'] || 0) > 0 && (hTags['durable'] || 0) < 0.7 && (hTags['escape'] || 0) < 0.5)) {
             const laningPenalty = 15.0 * enemyLaneBully;
-            score -= laningPenalty;
+            contextScore -= laningPenalty;
             reasoning.push(`Extremely risky in lane: vulnerable to intense enemy physical harass and lane bullying.`);
           }
         }
@@ -314,7 +319,7 @@ export function recommendHeroes(
             if (totalAllyWeight > 0) {
               const effectiveAllyWeight = Math.min(totalAllyWeight, 1.5);
               const addedScore = heroTagWeight * effectiveAllyWeight * multiplier * 1.5;
-              score += addedScore;
+              contextScore += addedScore;
               if (addedScore > 0.8) {
                 reasoning.push(`Strong synergy: ${hero.name}'s ${heroTag.replace(/_/g, ' ')} complements ${matchingAllies.join(', ')}'s ${allyTag.replace(/_/g, ' ')}.`);
               }
@@ -325,15 +330,15 @@ export function recommendHeroes(
 
       // Role Complement Checks
       if (teamDurable < 1.0 && hDurable > 1.0) {
-        score += 2.5;
+        contextScore += 2.5;
         reasoning.push(`Provides much needed frontline durability.`);
       }
       if (teamInitiation < 1.0 && hInitiation > 1.0) {
-        score += 2.5;
+        contextScore += 2.5;
         reasoning.push(`Provides much needed initiation to start fights.`);
       }
       if (teamWaveClear < 1.0 && hWaveClear > 1.0) {
-        score += 2.0;
+        contextScore += 2.0;
         reasoning.push(`Provides wave clear and pushing power.`);
       }
     }
@@ -342,33 +347,34 @@ export function recommendHeroes(
     if (desiredRole === 'Carry') {
       const carryTrait = (hTags['mobility'] || 0) + (hTags['escape'] || 0) + (hTags['durable'] || 0) + (hTags['tuff'] || 0) + (hTags['ranged_carry'] || 0) + (hTags['agility_core'] || 0) + (hTags['hard_carry'] || 0) + (hTags['illusioner'] || 0) + (hTags['brawler'] || 0);
       if (carryTrait < 1.0) {
-        score -= 6.0;
+        contextScore -= 6.0;
         reasoning.push(`${hero.name} lacks the stats, survivability, or mobility typical of a primary carry.`);
       } else {
-        score += (hTags['carry'] || 0) * 1.5;
+        contextScore += (hTags['carry'] || 0) * 1.5;
       }
     } else if (desiredRole === 'Offlane') {
       const offlaneTrait = (hTags['durable'] || 0) + (hTags['tuff'] || 0) + (hTags['initiator'] || 0) + (hTags['summoning'] || 0) + (hTags['passive_tank'] || 0) + (hTags['teamfight'] || 0);
       if (offlaneTrait < 1.0) {
-        score -= 5.0;
+        contextScore -= 5.0;
         reasoning.push(`${hero.name} lacks the survivability, stats, or initiation needed for a stable offlane.`);
       }
     } else if (desiredRole === 'Mid') {
       const midTrait = (hTags['mobility'] || 0) + (hTags['escape'] || 0) + (hTags['nuker'] || 0) + (hTags['pusher'] || 0) + (hTags['caster'] || 0) + (hTags['ranged_carry'] || 0) + (hTags['global_presence'] || 0) + (hTags['snowball'] || 0) + (hTags['brawler'] || 0);
       if (midTrait < 1.0) {
-        score -= 4.0;
+        contextScore -= 4.0;
         reasoning.push(`${hero.name} may struggle in mid due to lack of mobility, wave clear, or scaling stats.`);
       }
     } else if (desiredRole === 'Hard Support' || desiredRole === 'Soft Support') {
       const supportTrait = (hTags['support'] || 0) + (hTags['save'] || 0) + (hTags['hard_save'] || 0) + (hTags['disabler'] || 0) + (hTags['teamfight'] || 0) + (hTags['buff'] || 0) + (hTags['healing'] || 0);
       if (supportTrait < 1.0) {
-        score -= 4.0;
+        contextScore -= 4.0;
         reasoning.push(`${hero.name} lacks the utility, saves, or lockdown needed for a support role.`);
       }
     }
 
+    const finalScore = baseRoleScore + (contextScore * Kp);
     const uniqueReasoning = Array.from(new Set(reasoning));
-    return { hero, score, reasoning: uniqueReasoning.slice(0, 3) };
+    return { hero, score: finalScore, reasoning: uniqueReasoning.slice(0, 3) };
   });
 
   const sortedHeroes = evaluatedHeroes.sort((a, b) => b.score - a.score).slice(0, 4);
@@ -478,84 +484,210 @@ export interface ItemRecommendation {
   reasoning: string[];
 }
 
+export interface RecommendationPhase {
+  early_game: ItemRecommendation[];
+  mid_game: ItemRecommendation[];
+  late_game: ItemRecommendation[];
+  uber_late: ItemRecommendation[];
+}
+
 export function recommendItems(
   myHero: Hero,
-  enemies: EnemyState[],
-  gameStage: 'Early' | 'Mid' | 'Late'
-): ItemRecommendation[] {
-  const recommendations = ITEMS.map(item => {
-    let score = 0;
-    const reasoning: string[] = [];
+  myRole: Role,
+  enemies: EnemyState[]
+): RecommendationPhase {
+  // --- 1. Role Economic Multiplier Matrix (M_role) ---
+  const roleMatrix: Record<string, number[]> = {
+    'Carry': [1.0, 0.9, 1.1, 1.2, 1.2],
+    'Mid': [1.0, 1.0, 1.2, 1.1, 1.1],
+    'Offlane': [1.1, 1.2, 1.1, 1.0, 0.7],
+    'Soft Support': [1.2, 1.1, 0.9, 0.5, 0.2],
+    'Hard Support': [1.3, 1.0, 0.6, 0.2, 0.05],
+  };
 
-    // 1. Synergy with my hero
+  const getTier = (item: Item) => {
+    if (item.tier) {
+      const match = item.tier.match(/Тир-(\d+)/);
+      if (match) return parseInt(match[1], 10);
+    }
+    if (item.cost < 1500) return 1;
+    if (item.cost < 2800) return 2;
+    if (item.cost < 4000) return 3;
+    if (item.cost < 5500) return 4;
+    return 5;
+  };
+
+  const primaryRole = myRole || myHero.roles[0] || 'Carry';
+
+  // --- Dynamic Threat Tags & Math Model ---
+  const NEW_TAG_COUNTERS: Record<string, Record<string, number>> = {
+    'True_Strike': { 'Inherent_Evasion': 2.0, 'Item_Evasion': 1.5 },
+    'True_Strike_On_Target': { 'Inherent_Evasion': 1.5, 'Item_Evasion': 1.0 },
+    'Break': { 'Passive_Abilities_Core': 2.0, 'Passive_Armor_Regen_Gain': 2.0, 'Directional_Passive_Damage_Reduction': 2.0 },
+    'Regen_Reduction': { 'High_Health_Regen': 1.5, 'Healing_Dependency': 1.5, 'Passive_Armor_Regen_Gain': 1.0 },
+    'Armor_Corruption': { 'High_Armor_Physical': 1.5 },
+    'Magic_Damage': { 'High_Armor_Physical': 1.2 },
+    'True_Sight': { 'Save_In_Invis': 2.0 },
+    'Catch': { 'Save_In_Invis': 1.5, 'mobility': 1.5 },
+    'Silence': { 'Single_target_Disabler': 1.2, 'Magic_debuffs': 1.0 }
+  };
+
+  const evaluatedItems = ITEMS.map(item => {
+    let S_base = 0;
+    const baseReasoning: string[] = [];
+    const tier = getTier(item);
+
+    // --- 1. Base Synergy Weight (S_base) ---
     Object.entries(item.tags).forEach(([itemTag, itemTagWeight]) => {
       const synergyMapping = TAG_SYNERGIES[itemTag];
       if (synergyMapping) {
         Object.entries(synergyMapping).forEach(([heroTag, multiplier]) => {
           const heroTagWeight = myHero.tags[heroTag] || (myHero.id === heroTag ? 1.0 : 0);
           if (heroTagWeight > 0) {
-            const addedScore = itemTagWeight * heroTagWeight * multiplier;
-            score += addedScore;
-            if (addedScore > 0.6) {
-              reasoning.push(`Synergizes perfectly with your ${heroTag.replace(/_/g, ' ')} capabilities.`);
+            const added = itemTagWeight * heroTagWeight * multiplier;
+            S_base += added;
+            if (added > 0.6) {
+              baseReasoning.push(`Synergizes with your ${heroTag.replace(/_/g, ' ')}`);
             }
           }
         });
       }
     });
-    
-    // Legacy mapping support from generate_data.cjs (if any direct synergies exist in the item)
+
     Object.entries(item.synergies || {}).forEach(([tag, weight]) => {
       if (myHero.tags[tag]) {
-        score += weight * myHero.tags[tag];
+        S_base += weight * myHero.tags[tag];
       }
-      // Role synergy legacy
       if (myHero.roles.includes(tag as Role)) {
-        score += weight;
+        S_base += weight;
       }
     });
 
-    // 2. Countering enemies and their specific item builds
+    // --- 2. Dynamic Counter Weight (C_dynamic) ---
+    let C_dynamic = 0;
+    const counterReasoning: string[] = [];
+
     enemies.forEach(enemy => {
-      Object.entries(item.tags).forEach(([itemTag, itemTagWeight]) => {
-        const counterMapping = TAG_COUNTERS[itemTag];
-        if (counterMapping) {
-          Object.entries(counterMapping).forEach(([enemyTag, multiplier]) => {
-            // Countering the hero's innate tags
-            const enemyTagWeight = enemy.hero.tags[enemyTag] || (enemy.hero.id === enemyTag ? 1.0 : 0);
-            if (enemyTagWeight > 0) {
-              const counterScore = itemTagWeight * enemyTagWeight * multiplier;
-              score += counterScore;
-              if (counterScore > 0.5) {
-                reasoning.push(`Directly counters ${enemy.hero.name}'s ${enemyTag.replace(/_/g, ' ')}.`);
-              }
-            }
+      // Base Hero Threats
+      Object.entries(enemy.hero.tags).forEach(([enemyTag, enemyTagWeight]) => {
+        Object.entries(item.tags).forEach(([itemTag, itemTagWeight]) => {
+          const legacyMapping = TAG_COUNTERS[itemTag];
+          const newMapping = NEW_TAG_COUNTERS[itemTag];
+          
+          if (legacyMapping && legacyMapping[enemyTag]) {
+            const added = 1.0 * legacyMapping[enemyTag] * itemTagWeight * enemyTagWeight;
+            C_dynamic += added;
+            if (added > 0.5) counterReasoning.push(`Counters ${enemy.hero.name}'s ${enemyTag.replace(/_/g, ' ')}`);
+          }
+          if (newMapping && newMapping[enemyTag]) {
+            let k_crit = newMapping[enemyTag];
+            // Role specific critical scaling (e.g. Offlane Axe doesn't need MKB vs Evasion, but Carry does)
+            if (itemTag === 'True_Strike' && primaryRole === 'Offlane') k_crit *= 0.2;
             
-            // Countering the enemy's current items (High weight because items are reactive)
-            enemy.items.forEach(enemyItem => {
-              const enemyItemTagWeight = enemyItem.tags[enemyTag];
-              if (enemyItemTagWeight > 0) {
-                const counterScore = itemTagWeight * enemyItemTagWeight * multiplier * 2.0; // 2x multiplier
-                score += counterScore;
-                if (counterScore > 0.4) {
-                  reasoning.push(`Counters the ${enemyTag.replace(/_/g, ' ')} from ${enemy.hero.name}'s ${enemyItem.name}.`);
-                }
-              }
-            });
-          });
-        }
+            const added = 1.0 * k_crit * itemTagWeight * enemyTagWeight;
+            C_dynamic += added;
+            if (added > 0.5) counterReasoning.push(`Hard Counters ${enemy.hero.name}'s ${enemyTag.replace(/_/g, ' ')}`);
+          }
+        });
       });
-      
-      // Legacy mapping support
-      Object.entries(item.counters || {}).forEach(([tag, weight]) => {
-        if (enemy.hero.tags[tag]) {
-           score += weight * enemy.hero.tags[tag];
-        }
+
+      // Enemy Item Threats (Dynamic)
+      enemy.items.forEach(enemyItem => {
+        // E.g. enemy buys Butterfly -> Item_Evasion
+        const threatTags = { ...enemyItem.tags, [enemyItem.name.replace(/ /g, '_')]: 1.0 };
+        
+        Object.entries(threatTags).forEach(([enemyTag, enemyTagWeight]) => {
+          Object.entries(item.tags).forEach(([itemTag, itemTagWeight]) => {
+            const legacyMapping = TAG_COUNTERS[itemTag];
+            const newMapping = NEW_TAG_COUNTERS[itemTag];
+            
+            // Threat Value based on cost
+            const V_threat = 1.0 + (enemyItem.cost / 3000.0);
+
+            if (legacyMapping && legacyMapping[enemyTag]) {
+              const added = V_threat * legacyMapping[enemyTag] * itemTagWeight * enemyTagWeight;
+              C_dynamic += added;
+              if (added > 0.5) counterReasoning.push(`Answers ${enemyItem.name} on ${enemy.hero.name}`);
+            }
+            if (newMapping && newMapping[enemyTag]) {
+              let k_crit = newMapping[enemyTag];
+              if (itemTag === 'True_Strike' && primaryRole === 'Offlane') k_crit *= 0.2;
+              
+              const added = V_threat * k_crit * itemTagWeight * enemyTagWeight;
+              C_dynamic += added;
+              if (added > 0.5) counterReasoning.push(`Critical answer to ${enemyItem.name} on ${enemy.hero.name}`);
+            }
+          });
+        });
       });
     });
 
-    return { item, score, reasoning: Array.from(new Set(reasoning)).slice(0, 3) };
+    const M_role = roleMatrix[primaryRole]?.[tier - 1] ?? 1.0;
+
+    // --- Main Formula ---
+    // Note: P_progression is applied inside the specific phase construction
+    const W_base = 1.0;
+    const W_counter = 1.5;
+    const rawScoreWithoutProgression = ((S_base * W_base) + (C_dynamic * W_counter)) * M_role;
+
+    const reasoning = Array.from(new Set([...counterReasoning, ...baseReasoning])).slice(0, 3);
+
+    return {
+      item,
+      rawScore: rawScoreWithoutProgression,
+      reasoning,
+      tier,
+      S_base,
+      C_dynamic
+    };
   });
 
-  return recommendations.sort((a, b) => b.score - a.score).slice(0, 5);
+  // Helper to build a phase
+  const buildPhase = (
+    tierPredicate: (tier: number) => boolean,
+    count: number,
+    P_progression: number
+  ) => {
+    const candidates = evaluatedItems.filter(e => tierPredicate(e.tier));
+    const sorted = candidates.map(e => ({
+      item: e.item,
+      score: Math.min(10.0, e.rawScore * P_progression),
+      reasoning: e.reasoning
+    })).sort((a, b) => b.score - a.score);
+
+    // Filter duplicates and return top N
+    const unique = [];
+    const seen = new Set();
+    for (const c of sorted) {
+      if (!seen.has(c.item.id) && c.score > 0) {
+        unique.push(c);
+        seen.add(c.item.id);
+        if (unique.length === count) break;
+      }
+    }
+    return unique;
+  };
+
+  // Phase 1: Early Game (Tier 1-2, mostly 1)
+  const early_game = buildPhase(tier => tier <= 2, 4, 1.0);
+  
+  // Phase 2: Mid Game (Tier 2-3)
+  const mid_game = buildPhase(tier => tier >= 2 && tier <= 3, 4, 1.0);
+  
+  // Phase 3: Late Game (Tier 3-4)
+  const late_game = buildPhase(tier => tier >= 3 && tier <= 4, 4, 1.0);
+  
+  // Phase 4: Uber Late (Tier 5)
+  // Strict limitations on Tier 5 for supports are already handled by M_role
+  const uber_late = buildPhase(tier => tier >= 4, 4, 1.0);
+
+  // Sort each phase strictly by item cost (ascending) to maintain realistic progression
+  const costSort = (a: ItemRecommendation, b: ItemRecommendation) => a.item.cost - b.item.cost;
+  
+  return {
+    early_game: early_game.sort(costSort),
+    mid_game: mid_game.sort(costSort),
+    late_game: late_game.sort(costSort),
+    uber_late: uber_late.sort(costSort),
+  };
 }

@@ -63,6 +63,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "High_Armor_Physical": 1,
       "aoe_def": 4,
       "lane_strength": 7,
       "pierces_bkb": 1,
@@ -93,6 +94,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "Single_target_Disabler": 1,
+      "Pure_Damage": 1,
+      "Magic_debuffs": 1,
       "pierces_bkb": 1,
       "lane_strength": 8,
       "ranged": 1,
@@ -275,6 +279,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "High_Health_Regen": 1,
+      "Healing_Dependency": 1,
       "carry": 0.95,
       "escape": 0.9,
       "durable": 0.8,
@@ -419,14 +425,13 @@ export const HEROES: Hero[] = [
     "id": "sand_king",
     "name": "Sand King",
     "roles": [
-      "Mid",
       "Offlane",
       "Soft Support",
       "Hard Support"
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 1,
+      "Mid": 0,
       "Offlane": 0.7200000000000001,
       "Soft Support": 1,
       "Hard Support": 0.72
@@ -474,12 +479,11 @@ export const HEROES: Hero[] = [
     "name": "Sven",
     "roles": [
       "Carry",
-      "Mid",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0.9,
-      "Mid": 0.6,
+      "Mid": 0,
       "Offlane": 0.43200000000000005,
       "Soft Support": 0.6,
       "Hard Support": 0
@@ -717,7 +721,7 @@ export const HEROES: Hero[] = [
     ],
     "roleWeights": {
       "Carry": 0.4,
-      "Mid": 0.35,
+      "Mid": 0,
       "Offlane": 0.9,
       "Soft Support": 0.54,
       "Hard Support": 0
@@ -738,18 +742,19 @@ export const HEROES: Hero[] = [
     "id": "tidehunter",
     "name": "Tidehunter",
     "roles": [
-      "Mid",
       "Offlane",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0.4,
-      "Mid": 0.6,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.78,
       "Hard Support": 0
     },
     "tags": {
+      "High_Armor_Physical": 1,
+      "Passive_Abilities_Core": 1,
       "initiator": 1,
       "durable": 0.95,
       "disabler": 0.9,
@@ -822,6 +827,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Save_In_Invis": 1,
+      "Inherent_Evasion": 1,
       "melee": 1,
       "carry": 0.8,
       "escape": 0.9,
@@ -927,6 +934,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "High_Health_Regen": 1,
+      "Healing_Dependency": 1,
       "dispellable_buff": 1,
       "lane_strength": 8,
       "lane_bully": 0.8,
@@ -1058,6 +1067,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Passive_Abilities_Core": 1,
       "carry": 0.95,
       "initiator": 0.9,
       "disabler": 0.9,
@@ -1131,6 +1141,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Inherent_Evasion": 1,
+      "Physical_Burst": 1,
       "melee": 1,
       "passive_reliant": 1,
       "carry": 0.95,
@@ -1203,6 +1215,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Passive_Abilities_Core": 1,
       "harass_heavy": 1,
       "lane_strength": 9,
       "lane_bully": 1,
@@ -1256,6 +1269,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "High_Armor_Physical": 1,
+      "Passive_Armor_Regen_Gain": 1,
       "melee": 1,
       "passive_reliant": 0.8,
       "sustain": 0.8,
@@ -1298,13 +1313,12 @@ export const HEROES: Hero[] = [
     "id": "clockwerk",
     "name": "Clockwerk",
     "roles": [
-      "Mid",
       "Offlane",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 0.7,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.8099999999999999,
       "Hard Support": 0
@@ -1381,7 +1395,7 @@ export const HEROES: Hero[] = [
     ],
     "roleWeights": {
       "Carry": 0.9,
-      "Mid": 0.35,
+      "Mid": 0,
       "Offlane": 0.1,
       "Soft Support": 0,
       "Hard Support": 0
@@ -1458,7 +1472,7 @@ export const HEROES: Hero[] = [
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 0.15,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.8300000000000001,
       "Hard Support": 1
@@ -1523,6 +1537,9 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Passive_Abilities_Core": 1,
+      "Healing_Dependency": 1,
+      "High_Health_Regen": 1,
       "harass_heavy": 1,
       "lane_strength": 9,
       "lane_bully": 0.9,
@@ -1543,13 +1560,12 @@ export const HEROES: Hero[] = [
     "name": "Night Stalker",
     "roles": [
       "Carry",
-      "Mid",
       "Offlane",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0.75,
-      "Mid": 0.6,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.72,
       "Hard Support": 0
@@ -1603,12 +1619,13 @@ export const HEROES: Hero[] = [
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 0.33749999999999997,
+      "Mid": 0,
       "Offlane": 0,
       "Soft Support": 0.8500000000000001,
       "Hard Support": 0.96
     },
     "tags": {
+      "Save_In_Invis": 1,
       "support": 0.8,
       "escape": 0.85,
       "nuker": 0.7,
@@ -1773,13 +1790,12 @@ export const HEROES: Hero[] = [
     "name": "Doom",
     "roles": [
       "Carry",
-      "Mid",
       "Offlane",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0.75,
-      "Mid": 0.7,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.69,
       "Hard Support": 0
@@ -2168,6 +2184,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 1
     },
     "tags": {
+      "Save_In_Invis": 1,
       "support": 0.9,
       "initiator": 0.8,
       "durable": 0.8,
@@ -2189,7 +2206,7 @@ export const HEROES: Hero[] = [
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 0.24,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 1,
       "Hard Support": 1
@@ -2428,6 +2445,7 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Save_In_Invis": 1,
       "melee": 1,
       "passive_reliant": 0.8,
       "sustain": 0.9,
@@ -2493,13 +2511,12 @@ export const HEROES: Hero[] = [
     "id": "centaur_warrunner",
     "name": "Centaur Warrunner",
     "roles": [
-      "Mid",
       "Offlane",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 1,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.75,
       "Hard Support": 0
@@ -2560,6 +2577,8 @@ export const HEROES: Hero[] = [
       "Hard Support": 0
     },
     "tags": {
+      "Passive_Armor_Regen_Gain": 1,
+      "High_Health_Regen": 1,
       "melee": 1,
       "passive_reliant": 0.9,
       "sustain": 0.8,
@@ -2577,17 +2596,18 @@ export const HEROES: Hero[] = [
     "name": "Bristleback",
     "roles": [
       "Carry",
-      "Mid",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0.85,
-      "Mid": 0.7,
+      "Mid": 0,
       "Offlane": 0.502,
       "Soft Support": 0.63,
       "Hard Support": 0
     },
     "tags": {
+      "Directional_Passive_Damage_Reduction": 1,
+      "High_Health_Regen": 1,
       "melee": 1,
       "sustain": 0.8,
       "passive_reliant": 1,
@@ -2607,13 +2627,12 @@ export const HEROES: Hero[] = [
     "id": "tusk",
     "name": "Tusk",
     "roles": [
-      "Mid",
       "Offlane",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 0.7,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 0.72,
       "Hard Support": 0.4
@@ -2711,12 +2730,11 @@ export const HEROES: Hero[] = [
     "name": "Legion Commander",
     "roles": [
       "Carry",
-      "Mid",
       "Soft Support"
     ],
     "roleWeights": {
       "Carry": 0.8,
-      "Mid": 0.6,
+      "Mid": 0,
       "Offlane": 0.454,
       "Soft Support": 0.72,
       "Hard Support": 0
@@ -2799,7 +2817,7 @@ export const HEROES: Hero[] = [
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 0.33749999999999997,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 1,
       "Hard Support": 1
@@ -2820,14 +2838,13 @@ export const HEROES: Hero[] = [
     "id": "underlord",
     "name": "Underlord",
     "roles": [
-      "Mid",
       "Offlane",
       "Soft Support",
       "Hard Support"
     ],
     "roleWeights": {
       "Carry": 0,
-      "Mid": 1,
+      "Mid": 0,
       "Offlane": 1,
       "Soft Support": 1,
       "Hard Support": 0.84
@@ -2851,12 +2868,11 @@ export const HEROES: Hero[] = [
     "id": "terrorblade",
     "name": "Terrorblade",
     "roles": [
-      "Carry",
-      "Mid"
+      "Carry"
     ],
     "roleWeights": {
       "Carry": 0.95,
-      "Mid": 0.7,
+      "Mid": 0,
       "Offlane": 0,
       "Soft Support": 0.21,
       "Hard Support": 0
@@ -4045,6 +4061,7 @@ export const ITEMS: Item[] = [
     "cost": 900,
     "tier": "Тир-2: Ранние предметы",
     "tags": {
+      "True_Sight": 1,
       "true_sight": 1,
       "high_risk": 1
     },
@@ -4293,6 +4310,8 @@ export const ITEMS: Item[] = [
     "cost": 80,
     "tier": "Тир-1: Начальные предметы",
     "tags": {
+      "True_Sight": 1,
+      "Catch": 1,
       "true_sight": 0.8,
       "slow": 0.4
     },
@@ -5086,6 +5105,7 @@ export const ITEMS: Item[] = [
     "cost": 5200,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "Catch": 1,
       "control": 0.8,
       "mana_regen": 0.9
     },
@@ -5103,6 +5123,8 @@ export const ITEMS: Item[] = [
     "cost": 3275,
     "tier": "Тир-3: Мидгейм",
     "tags": {
+      "Catch": 1,
+      "Silence": 1,
       "silence": 1,
       "damage_burst": 0.5,
       "catch": 0.7
@@ -5126,6 +5148,9 @@ export const ITEMS: Item[] = [
     "cost": 6400,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "True_Strike_On_Target": 1,
+      "True_Strike": 1,
+      "Silence": 1,
       "damage_amp": 1,
       "true_strike": 0.9,
       "damage_burst": 0.9,
@@ -5397,6 +5422,7 @@ export const ITEMS: Item[] = [
     "cost": 5125,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "Armor_Corruption": 1,
       "aura_armor": 1,
       "aura_attack_speed": 1,
       "armor_corruption": 0.8,
@@ -5466,6 +5492,8 @@ export const ITEMS: Item[] = [
     "cost": 4500,
     "tier": "Тир-4: Ключевые артефакты",
     "tags": {
+      "Regen_Reduction": 1,
+      "Armor_Corruption": 1,
       "aoe_damage": 0.7,
       "aoe_slow": 0.9,
       "aura_attack_slow": 1,
@@ -5679,6 +5707,7 @@ export const ITEMS: Item[] = [
     "cost": 2725,
     "tier": "Тир-3: Мидгейм",
     "tags": {
+      "Regen_Reduction": 1,
       "anti_heal": 1,
       "damage_over_time": 0.9,
       "healing": 0.8,
@@ -5875,6 +5904,7 @@ export const ITEMS: Item[] = [
     "cost": 5000,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "True_Strike": 1,
       "true_strike": 1,
       "damage_proc": 0.9
     },
@@ -5890,6 +5920,8 @@ export const ITEMS: Item[] = [
     "cost": 4700,
     "tier": "Тир-4: Ключевые артефакты",
     "tags": {
+      "Magic_Damage": 1,
+      "Item_Evasion": 1,
       "aoe_damage": 1,
       "evasion": 0.8,
       "farming": 0.9
@@ -5917,6 +5949,7 @@ export const ITEMS: Item[] = [
     "cost": 5450,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "Item_Evasion": 1,
       "evasion": 1,
       "agility_boost": 1
     },
@@ -6090,6 +6123,8 @@ export const ITEMS: Item[] = [
     "cost": 5700,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "Break": 1,
+      "Save_In_Invis": 1,
       "break": 1,
       "invisibility": 0.9,
       "initiation": 0.8
@@ -6193,6 +6228,7 @@ export const ITEMS: Item[] = [
     "cost": 5500,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "Magic_Damage": 1,
       "farming": 0.9,
       "aoe_damage": 0.7
     },
@@ -6216,6 +6252,7 @@ export const ITEMS: Item[] = [
     "cost": 5900,
     "tier": "Тир-5: Люкс слоты",
     "tags": {
+      "Regen_Reduction": 1,
       "anti_heal": 0.5,
       "power_boost": 0.7,
       "slow": 0.8,
@@ -6332,6 +6369,7 @@ export const ITEMS: Item[] = [
     "cost": 3500,
     "tier": "Тир-4: Ключевые артефакты",
     "tags": {
+      "Armor_Corruption": 1,
       "armor_corruption": 1,
       "building_damage": 0.9
     },
@@ -6861,6 +6899,7 @@ export const ITEMS: Item[] = [
     "cost": 3400,
     "tier": "Тир-3: Мидгейм",
     "tags": {
+      "Item_Evasion": 1,
       "disarm": 1,
       "evasion": 0.8,
       "status_resistance": 0.7,
